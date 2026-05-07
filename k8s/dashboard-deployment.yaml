@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-analyzer-dashboard
+  namespace: review-analyzer
+  labels:
+    app: review-analyzer-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: review-analyzer-dashboard
+  template:
+    metadata:
+      labels:
+        app: review-analyzer-dashboard
+    spec:
+      containers:
+        - name: dashboard
+          image: review-analyzer:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - streamlit
+            - run
+            - src/review_analyzer/dashboard/app.py
+            - --server.address=0.0.0.0
+            - --server.port=8501
+          ports:
+            - containerPort: 8501
+          envFrom:
+            - configMapRef:
+                name: review-analyzer-config
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 150m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi

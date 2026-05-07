@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-analyzer-api
+  namespace: review-analyzer
+  labels:
+    app: review-analyzer-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: review-analyzer-api
+  template:
+    metadata:
+      labels:
+        app: review-analyzer-api
+    spec:
+      containers:
+        - name: api
+          image: review-analyzer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: review-analyzer-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 750m
+              memory: 1Gi

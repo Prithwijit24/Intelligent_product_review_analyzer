@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: review-analyzer-config
+  namespace: review-analyzer
+data:
+  ENVIRONMENT: kubernetes
+  SPACY_MODEL: en_core_web_sm
+  API_URL: http://review-analyzer-api:8000
+  LOG_LEVEL: INFO
