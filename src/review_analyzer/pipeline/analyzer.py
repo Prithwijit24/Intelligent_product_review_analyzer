@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING
 
 from review_analyzer.nlp.aspects import AspectExtractor
 from review_analyzer.nlp.cleaner import clean_text
-from review_analyzer.nlp.entities import extract_entities
+from review_analyzer.nlp.entities import ProductEntityRecognizer
 from review_analyzer.nlp.normalizer import normalize
 from review_analyzer.nlp.sentiment import RuleBasedSentimentAnalyzer
 from review_analyzer.nlp.tagger import tag_review
 from review_analyzer.nlp.tokenizer import tokenize
-from review_analyzer.pipeline.schemas import AnalysisResult
+from review_analyzer.pipeline.schemas import AnalysisResult, NamedEntity
 
 if TYPE_CHECKING:
     from spacy.language import Language
@@ -23,6 +23,7 @@ class ReviewAnalyzer:
     def __init__(self, nlp: Language | None = None) -> None:
         self.nlp = nlp
         self.aspect_extractor = AspectExtractor(nlp=nlp)
+        self.entity_recognizer = ProductEntityRecognizer(nlp=nlp)
         self.sentiment_analyzer = RuleBasedSentimentAnalyzer()
 
     def analyze(self, review_text: str, product_id: str | None = None) -> AnalysisResult:
@@ -31,6 +32,16 @@ class ReviewAnalyzer:
         normalized_tokens = normalize(cleaned, self.nlp)
         aspect_terms = self.aspect_extractor.extract(cleaned)
         aspects = self.sentiment_analyzer.aspect_sentiments(cleaned)
+        named_entities = [
+            NamedEntity(
+                text=entity.text,
+                label=entity.label,
+                start_char=entity.start_char,
+                end_char=entity.end_char,
+                source=entity.source,
+            )
+            for entity in self.entity_recognizer.extract(cleaned)
+        ]
 
         for aspect in aspect_terms:
             aspects.setdefault(aspect, "neutral")
@@ -43,7 +54,8 @@ class ReviewAnalyzer:
             aspects=aspects,
             aspect_terms=aspect_terms,
             tags=tag_review(cleaned),
-            entities=extract_entities(cleaned, self.nlp),
+            entities=sorted({entity.text for entity in named_entities if entity.text}),
+            named_entities=named_entities,
             tokens=tokens,
             normalized_tokens=normalized_tokens,
         )

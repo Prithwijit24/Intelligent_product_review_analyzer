@@ -119,11 +119,23 @@ Example response:
   },
   "tags": ["complaint", "praise"],
   "entities": [],
+  "named_entities": [],
   "cleaned_text": "The product quality is great but delivery was very slow.",
   "tokens": ["The", "product", "quality", "is", "great", "but", "delivery", "was", "very", "slow", "."],
   "normalized_tokens": ["product", "quality", "great", "delivery", "slow"]
 }
 ```
+
+## NER Scaffold
+
+The project includes a product-review NER scaffold in `src/review_analyzer/nlp/entities.py`.
+It combines spaCy entities (`ORG`, `PRODUCT`, `GPE`, `NORP`) with rule-based product
+attributes (`BRAND`, `COLOR`, `SIZE`).
+
+Pipeline responses now expose:
+
+- `entities`: backward-compatible list of entity text values
+- `named_entities`: structured entities with `text`, `label`, `start_char`, `end_char`, and `source`
 
 ## Run the Dashboard
 

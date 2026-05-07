@@ -15,3 +15,12 @@ def test_analyzer_returns_structured_review_insights() -> None:
     assert result.aspects["delivery"] == "negative"
     assert "praise" in result.tags
     assert "complaint" in result.tags
+
+
+def test_analyzer_returns_structured_named_entities() -> None:
+    analyzer = ReviewAnalyzer()
+
+    result = analyzer.analyze("The red large backpack from PackCo feels durable.")
+
+    assert result.entities == ["PackCo", "large", "red"]
+    assert {entity.label for entity in result.named_entities} == {"BRAND", "COLOR", "SIZE"}
