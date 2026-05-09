@@ -26,6 +26,8 @@ async def test_analyze_endpoint(client: AsyncClient) -> None:
     assert body["aspects"]["price"] == "positive"
     assert body["aspects"]["packaging"] == "negative"
     assert "complaint" in body["tags"]
+    assert "entities" not in body
+    assert "named_entities" not in body
 
 
 @pytest.mark.anyio

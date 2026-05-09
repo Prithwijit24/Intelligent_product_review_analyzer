@@ -2,14 +2,13 @@
 
 An end-to-end NLP application for extracting structured insight from product reviews. It provides a FastAPI backend, a Streamlit dashboard, Docker Compose for local deployment, and Kubernetes manifests for cluster deployment.
 
-The first version is intentionally runnable without downloading large datasets. It uses a deterministic rule-based NLP baseline for aspect sentiment, review tags, and entity extraction, with training modules included for later TF-IDF and logistic regression experiments.
+The first version is intentionally runnable without downloading large datasets. It uses a deterministic rule-based NLP baseline for aspect sentiment and review tags, with training modules included for later TF-IDF and logistic regression experiments.
 
 ## Features
 
 - Aspect-level sentiment for `price`, `quality`, `delivery`, and `packaging`
 - Overall sentiment: `positive`, `neutral`, `negative`, or `mixed`
 - Review tags: `complaint`, `praise`, `suggestion`, `question`, or `neutral`
-- Entity extraction for spaCy entities plus product attributes such as color, size, and brand hints
 - FastAPI endpoints for analysis and health checks
 - FastAPI lifespan startup that warms the NLP pipeline before serving traffic
 - Streamlit dashboard for interactive review analysis
@@ -33,7 +32,6 @@ ReviewAnalyzer Pipeline
         +-- aspect extractor
         +-- sentiment analyzer
         +-- tagger
-        +-- entity extractor
         |
         v
 Structured JSON Insights
@@ -73,7 +71,7 @@ pip install -e ".[dev]"
 python -m spacy download en_core_web_sm
 ```
 
-The app falls back to a blank English spaCy pipeline if `en_core_web_sm` is not installed, but the full model is recommended for better entity extraction.
+The app falls back to a blank English spaCy pipeline if `en_core_web_sm` is not installed, but the full model is recommended for better token normalization.
 
 Optional local environment file:
 
@@ -118,24 +116,11 @@ Example response:
     "delivery": ["slow"]
   },
   "tags": ["complaint", "praise"],
-  "entities": [],
-  "named_entities": [],
   "cleaned_text": "The product quality is great but delivery was very slow.",
   "tokens": ["The", "product", "quality", "is", "great", "but", "delivery", "was", "very", "slow", "."],
   "normalized_tokens": ["product", "quality", "great", "delivery", "slow"]
 }
 ```
-
-## NER Scaffold
-
-The project includes a product-review NER scaffold in `src/review_analyzer/nlp/entities.py`.
-It combines spaCy entities (`ORG`, `PRODUCT`, `GPE`, `NORP`) with rule-based product
-attributes (`BRAND`, `COLOR`, `SIZE`).
-
-Pipeline responses now expose:
-
-- `entities`: backward-compatible list of entity text values
-- `named_entities`: structured entities with `text`, `label`, `start_char`, `end_char`, and `source`
 
 ## Run the Dashboard
 

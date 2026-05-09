@@ -77,10 +77,9 @@ def main() -> None:
         return
 
     st.divider()
-    summary_cols = st.columns(3)
+    summary_cols = st.columns(2)
     summary_cols[0].metric("Overall sentiment", str(result["overall_sentiment"]).title())
     summary_cols[1].metric("Aspects found", len(result["aspects"]))
-    summary_cols[2].metric("Entities found", len(result["entities"]))
 
     chart_col, detail_col = st.columns([0.55, 0.45], gap="large")
 
@@ -111,12 +110,6 @@ def main() -> None:
     with detail_col:
         st.subheader("Tags")
         render_tags(list(result["tags"]))
-
-        st.subheader("Entities")
-        if result["entities"]:
-            st.write(", ".join(result["entities"]))
-        else:
-            st.write("No entities detected.")
 
         st.subheader("Aspect Terms")
         st.json(result["aspect_terms"])

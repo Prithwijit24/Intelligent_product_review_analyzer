@@ -30,6 +30,7 @@ dependencies = [
     "catboost>=1.2.10",
     "gensim>=4.4.0",
     "optuna>=4.8.0",
+    "scrapling[shell]>=0.4.7",
 ]
 
 [project.optional-dependencies]
